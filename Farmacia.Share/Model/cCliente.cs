@@ -9,7 +9,7 @@ namespace Farmacia.Share.Model
     public class cCliente
     {
 
-        public short IdCliente { get; set; }
+        public string Identificacion { get; set; }
         public string Nombre { get; set; }
         public DateTime FechaNacimiento { get; set; }
         public string Telefono { get; set; }
@@ -19,7 +19,7 @@ namespace Farmacia.Share.Model
         public cCliente()
         {
 
-            IdCliente = 0;
+            Identificacion = string.Empty;
             Nombre = string.Empty;
             FechaNacimiento = DateTime.MinValue;
             Telefono = string.Empty;

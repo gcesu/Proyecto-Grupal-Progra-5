@@ -8,13 +8,13 @@ namespace Farmacia.Share.Model
 {
     public class cClienteMedicamento
     {
-        public short IdClienteMedicamento { get; set; }
+        public string Identificacion { get; set; }
         public short IdMedicamento { get; set; }
         public string Dosis { get; set; }
         public cClienteMedicamento()
         {
 
-            IdClienteMedicamento = 0;
+            Identificacion = string.Empty;
             IdMedicamento = 0;
             Dosis = string.Empty;
         }

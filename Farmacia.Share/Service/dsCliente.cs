@@ -46,8 +46,8 @@ namespace Farmacia.Share.Service
             {
                 var db = dbcon();
                 var sql = @"SELECT Identificacion, Nombre, FechaNacimiento, Telefono, Email, Estado FROM ClienteFarmacia WHERE Identificacion = @Identificacion;";
-                var resultado = await db.QueryFirstOrDefaultAsync<cCliente>(sql.ToString(), new { pIdentificacion });  // Funcion Asincrona
-                return resultado;
+                var resultado = await db.QueryAsync<cCliente>(sql.ToString(), new { pIdentificacion }); // Parametro de busqueda
+                return resultado.FirstOrDefault();
             }
             catch (Exception ex)
             {
@@ -85,13 +85,13 @@ namespace Farmacia.Share.Service
             }
         }
 
-        public async Task<bool> deleteCliente(string pIdentificacion)  // Funcion Asincrona
+        public async Task<bool> deleteCliente(cCliente pCliente)  // Funcion Asincrona
         {
             try
             {
                 var db = dbcon();
                 var sql = @"DELETE FROM ClienteFarmacia WHERE Identificacion = @Identificacion;";
-                var resultado = await db.ExecuteAsync(sql.ToString(), new { pIdentificacion });     // Parametros
+                var resultado = await db.ExecuteAsync(sql.ToString(), new { pCliente.Identificacion });     // Parametros
                 return true;
             }
             catch (Exception ex)

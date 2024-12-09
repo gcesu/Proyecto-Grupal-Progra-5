@@ -40,7 +40,7 @@ namespace Farmacia.Share.Service
             }
         }
 
-        public async Task<cMedicamento> getMedicamento(short pIdMedicamento)
+        public async Task<cMedicamento> getMedicamento(int pIdMedicamento)
         {
             try
             {
@@ -85,13 +85,13 @@ namespace Farmacia.Share.Service
             }
         }
 
-        public async Task<bool> deleteMedicamento(short pIdMedicamento)
+        public async Task<bool> deleteMedicamento(cMedicamento pMedicamento)
         {
             try
             {
                 var db = dbcon();
                 var sql = @"DELETE FROM Medicamento WHERE IdMedicamento = @IdMedicamento;";
-                var resultado = await db.ExecuteAsync(sql.ToString(), new { pIdMedicamento });
+                var resultado = await db.ExecuteAsync(sql.ToString(), new { pMedicamento.IdMedicamento });
                 return true;
             }
             catch (Exception ex)

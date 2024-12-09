@@ -40,7 +40,7 @@ namespace Farmacia.Share.Service
             }
         }
 
-        public async Task<cClienteMedicamento> getClienteMedicamento(string pIdentificacion, short pIdMedicamento)
+        public async Task<cClienteMedicamento> getClienteMedicamento(string pIdentificacion, int pIdMedicamento)
         {
             try
             {
@@ -85,13 +85,13 @@ namespace Farmacia.Share.Service
             }
         }
 
-        public async Task<bool> deleteClienteMedicamento(string pIdentificacion, short pIdMedicamento)
+        public async Task<bool> deleteClienteMedicamento(cClienteMedicamento pClienteMedicamento)
         {
             try
             {
                 var db = dbcon();
                 var sql = @"DELETE FROM ClienteMedicamento WHERE Identificacion = @Identificacion AND IdMedicamento = @IdMedicamento;";
-                var resultado = await db.ExecuteAsync(sql.ToString(), new { pIdentificacion, pIdMedicamento });
+                var resultado = await db.ExecuteAsync(sql.ToString(), new { pClienteMedicamento.Identificacion, pClienteMedicamento.IdMedicamento });
                 return true;
             }
             catch (Exception ex)

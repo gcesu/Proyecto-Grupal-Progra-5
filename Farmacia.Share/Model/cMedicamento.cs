@@ -9,7 +9,7 @@ namespace Farmacia.Share.Model
     public class cMedicamento
     {
 
-        public short IdMedicamento { get; set; }
+        public int IdMedicamento { get; set; }
         public string Descripcion { get; set; }
         public string Presentacion { get; set; }
         public string Marca { get; set; }

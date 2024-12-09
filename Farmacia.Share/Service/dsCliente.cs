@@ -40,13 +40,13 @@ namespace Farmacia.Share.Service
         }
 
 
-        public async Task<cCliente> getCliente(string pIdentificacion)  // Funcion Asincrona
+        public async Task<cCliente> getCliente(string Identificacion)
         {
             try
             {
                 var db = dbcon();
-                var sql = @"SELECT Identificacion, Nombre, FechaNacimiento, Telefono, Email, Estado FROM ClienteFarmacia WHERE Identificacion = @Identificacion;";
-                var resultado = await db.QueryAsync<cCliente>(sql.ToString(), new { pIdentificacion }); // Parametro de busqueda
+                var sql = @"SELECT Identificacion, Nombre, FechaNacimiento, Telefono, Email, Estado FROM ClienteFarmacia WHERE Identificacion = @Identificacion";
+                var resultado = await db.QueryAsync<cCliente>(sql.ToString(), new { Identificacion = Identificacion });
                 return resultado.FirstOrDefault();
             }
             catch (Exception ex)

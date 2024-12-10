@@ -1,4 +1,6 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using Farmacia.BLL.Interface;
+using Farmacia.BLL.Service;
+using Microsoft.Extensions.Logging;
 using Radzen;
 
 namespace Farmacia
@@ -16,6 +18,12 @@ namespace Farmacia
                 });
 
             builder.Services.AddMauiBlazorWebView();
+
+
+            builder.Services.AddSingleton<ICliente, sCliente>(); // Inyeccion de dependencia de la interfaz ICliente
+            builder.Services.AddSingleton<IMedicamento, sMedicamento>(); // Inyeccion de dependencia de la interfaz IProducto
+            builder.Services.AddSingleton<IClienteMedicamento, sClienteMedicamento>(); // Inyeccion de dependencia de la interfaz IVenta
+
             builder.Services.AddRadzenComponents();
             builder.Services.AddMauiBlazorWebView();
             builder.Services.AddScoped<DialogService>();

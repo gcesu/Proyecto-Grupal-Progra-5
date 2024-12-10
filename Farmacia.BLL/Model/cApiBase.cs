@@ -9,8 +9,8 @@ namespace Farmacia.BLL.Model
     public class cApiBase
     {
 
-        private string WebApiUrl = "https://gymapi.kasecr.com/";
-        //private string WebApiUrl = "https://localhost:7172/";
+        //private string WebApiUrl = "https://gymapi.kasecr.com/";
+        private string WebApiUrl = "https://localhost:7234/";
 
         public string getWebApiUrl()
         {

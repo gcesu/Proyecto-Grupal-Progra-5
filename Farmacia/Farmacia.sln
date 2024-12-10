@@ -3,13 +3,13 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.11.35327.3
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Farmacia", "Farmacia.csproj", "{4D6FAD75-D76A-4BCC-B660-77946F96D556}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Farmacia", "Farmacia.csproj", "{4D6FAD75-D76A-4BCC-B660-77946F96D556}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Farmacia.WebAPI", "..\Farmacia.WebAPI\Farmacia.WebAPI.csproj", "{E542A5C3-8864-4185-808D-09E2D771442D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Farmacia.WebAPI", "..\Farmacia.WebAPI\Farmacia.WebAPI.csproj", "{E542A5C3-8864-4185-808D-09E2D771442D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Farmacia.Share", "..\Farmacia.Share\Farmacia.Share.csproj", "{E8C26EF8-756C-49B9-8258-3B651DD6C1DE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Farmacia.Share", "..\Farmacia.Share\Farmacia.Share.csproj", "{E8C26EF8-756C-49B9-8258-3B651DD6C1DE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Farmacia.BLL", "..\Farmacia.BLL\Farmacia.BLL.csproj", "{1219683D-BB42-497C-AD22-158465E92466}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Farmacia.BLL", "..\Farmacia.BLL\Farmacia.BLL.csproj", "{1219683D-BB42-497C-AD22-158465E92466}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

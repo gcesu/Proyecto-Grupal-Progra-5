@@ -1,0 +1,188 @@
+﻿@page "/clientes"
+@using Farmacia.Share.Model;
+@using Farmacia.BLL.Interface
+@using Farmacia.BLL.Model
+@inject ICliente mdsClientes;
+@inject NotificationService Notification;
+
+<h1>Clientes</h1>
+
+
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="row">
+            <RadzenDataGrid Data="@mListaClientes" AllowSorting="true" Style="400px;" TItem="cCliente" AllowPaging="true" FilterPopupRenderMode="PopupRenderMode.OnDemand" PageSize="5" SelectionMode="DataGridSelectionMode.Single" @bind-Value=@mClienteSeleccionado>
+
+                <Columns>
+                    <RadzenDataGridColumn Property="@nameof(cCliente.Identificacion)" Title="ID"></RadzenDataGridColumn>
+                    <RadzenDataGridColumn Property="@nameof(cCliente.Nombre)" Title="Cliente"></RadzenDataGridColumn>
+                    <RadzenDataGridColumn Property="@nameof(cCliente.FechaNacimiento)" Title="Fecha"></RadzenDataGridColumn>
+                    <RadzenDataGridColumn Property="@nameof(cCliente.Telefono)" Title="Telefono"></RadzenDataGridColumn>
+                    <RadzenDataGridColumn Property="@nameof(cCliente.Email)" Title="Email"></RadzenDataGridColumn>
+                    <RadzenDataGridColumn Property="@nameof(cCliente.Estado)" Title="Estado"></RadzenDataGridColumn>
+                </Columns>
+            </RadzenDataGrid>
+        </div>
+
+        <div class="row" style="margin: 10px">
+            <div class="col-md-4 col-lg-4 col-xl-4 col-xxl-4 col-sm-12 col-xs-12" style="margin: 5px">
+                <RadzenButton ButtonStyle="ButtonStyle.Primary" Text="Editar" Click="@EditarCliente" />
+            </div>
+
+            <div class="col-md-4 col-lg-4 col-xl-4 col-xxl-4 col-sm-12 col-xs-12" style="margin: 5px">
+                <RadzenButton ButtonStyle="ButtonStyle.Danger" Text="Eliminar" Click="@EliminarCliente" />
+            </div>
+        </div>
+
+    </div>
+</div>
+<style>
+    .container {
+        margin-bottom: 20px;
+    }
+</style>
+
+
+<div class="container mt-4">
+    <div class="container mt-4">
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <RadzenCard>
+                    <RadzenFieldset style="margin: 3px">
+                        <div class="form-group" style="margin-top: 6px">
+                            <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Digite la Identificacion</RadzenText>
+                            <RadzenTextBox @bind-Value="@mCliente.Identificacion" style="width: 100%" aria-label="Identificacion" />
+                        </div>
+                        <div class="form-group">
+                            <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Digite el Nombre</RadzenText>
+                            <RadzenTextBox @bind-Value="@mCliente.Nombre" style="width: 100%" aria-label="Nombre" />
+                        </div>
+                        <div class="form-group">
+                            <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Digite la Fecha de Nacimiento</RadzenText>
+                            <RadzenDatePicker @bind-Value="@mCliente.FechaNacimiento" style="width: 100%" aria-label="Fecha de Nacimiento" />
+                        </div>
+                        
+                        <div class="form-group">
+                            <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Digite el Telefono</RadzenText>
+                            <RadzenTextBox @bind-Value="@mCliente.Telefono" style="width: 100%" aria-label="Telefono" />
+                        </div>
+
+                        <div class="form-group">
+                            <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Digite el Email</RadzenText>
+                            <RadzenTextBox @bind-Value="@mCliente.Email" style="width: 100%" aria-label="Email" />
+                        </div>
+
+                        <div class="form-group"> 
+                                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Digite el Estado</RadzenText>
+                                <RadzenTextBox @bind-Value="@mCliente.Estado" style="width: 100%" aria-label="Estado" />
+                        </div>
+
+                        <div class="row" style="margin-top: 10px;">
+                            <div class="col-md-4 col-lg-4 col-xl-4 col-xxl-4 col-sm-12 col-xs-12" style="margin: 5px">
+                                <RadzenButton ButtonStyle="ButtonStyle.Primary" Text="Agregar" Click="@AgregarCliente" />
+                            </div>
+                            <div class="col-md-4 col-lg-4 col-xl-4 col-xxl-4 col-sm-12 col-xs-12" style="margin: 5px">
+                                <RadzenButton ButtonStyle="ButtonStyle.Secondary" Text="Actualizar" Click="@ActualizarCliente" />
+                            </div>
+                            
+                        </div>
+                    </RadzenFieldset>
+                </RadzenCard>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@code {
+
+
+    List<cCliente> mListaClientes;
+    IList<cCliente> mClienteSeleccionado;
+    cCliente mCliente = new cCliente();
+
+    protected override async Task OnInitializedAsync()
+    {
+        mListaClientes = await mdsClientes.getClientes();
+    }
+
+    private async Task AgregarCliente()
+    {
+        if (await mdsClientes.agregarCliente(mCliente) == true)
+        {
+            mListaClientes = await mdsClientes.getClientes();
+            mCliente = new cCliente();
+            StateHasChanged();
+            Notification.Notify(new NotificationMessage 
+                { 
+                    Severity = NotificationSeverity.Success, 
+                    Summary = "Cliente Agregado", 
+                    Detail = "El cliente se ha agregado correctamente" 
+                });
+        }
+        else
+        {
+            Notification.Notify(new NotificationMessage 
+                { 
+                    Severity = NotificationSeverity.Error, 
+                    Summary = "Error", 
+                    Detail = "Error al agregar el cliente" 
+                });
+        }
+    }
+
+    private async Task EditarCliente()
+    {
+        mCliente = mClienteSeleccionado.FirstOrDefault();
+    }
+
+    private async Task ActualizarCliente()
+    {
+        if (await mdsClientes.actualizarCliente(mCliente) == true)
+        {
+            mListaClientes = await mdsClientes.getClientes();
+            mCliente = new cCliente();
+            StateHasChanged();
+            Notification.Notify(new NotificationMessage 
+                { 
+                    Severity = NotificationSeverity.Success, 
+                    Summary = "Cliente Editado", 
+                    Detail = "El cliente se ha editado correctamente" 
+                });
+        }
+        else
+        {
+            Notification.Notify(new NotificationMessage 
+                { Severity = NotificationSeverity.Error, 
+                    Summary = "Error", 
+                    Detail = "Error al editar el cliente"
+                });
+        }
+    }
+
+    private async Task EliminarCliente()
+    {
+        if (await mdsClientes.eliminarCliente(mClienteSeleccionado.FirstOrDefault().Identificacion) == true)
+        {
+            mListaClientes = await mdsClientes.getClientes();
+            mCliente = new cCliente();
+            StateHasChanged();
+            Notification.Notify(new NotificationMessage 
+                { 
+                    Severity = NotificationSeverity.Success, 
+                    Summary = "Cliente Eliminado", 
+                    Detail = "El cliente se ha eliminado correctamente" 
+                });
+        }
+        else
+        {
+            Notification.Notify(new NotificationMessage 
+                { 
+                    Severity = NotificationSeverity.Error, 
+                    Summary = "Error", 
+                    Detail = "Error al eliminar el cliente" 
+                });
+        }
+    }
+
+}

@@ -53,7 +53,7 @@ namespace Farmacia.BLL.Service
             try
             {
                 cApiBase mapi = new cApiBase();
-                urlApi = mapi.getWebApiUrl().ToString().Trim() + $"api/Cliente/getcliente/{pIdCliente}";
+                urlApi = mapi.getWebApiUrl().ToString().Trim() + $"api/Cliente/getcliente";
                 var httpClient = new HttpClient();
                 var respuesta = await httpClient.GetAsync(urlApi);
                 if (respuesta.IsSuccessStatusCode)
@@ -78,7 +78,7 @@ namespace Farmacia.BLL.Service
             try
             {
                 cApiBase mapi = new cApiBase();
-                urlApi = mapi.getWebApiUrl().ToString().Trim() + "api/Cliente/agregarcliente";
+                urlApi = mapi.getWebApiUrl().ToString().Trim() + "api/Cliente/insertCliente";
                 var httpClient = new HttpClient();
                 var respuesta = await httpClient.PostAsJsonAsync(urlApi, pCliente);
                 if (respuesta.IsSuccessStatusCode)
@@ -101,7 +101,7 @@ namespace Farmacia.BLL.Service
             try
             {
                 cApiBase mapi = new cApiBase();
-                urlApi = mapi.getWebApiUrl().ToString().Trim() + "api/Cliente/actualizarcliente";
+                urlApi = mapi.getWebApiUrl().ToString().Trim() + "api/Cliente/updateCliente";
                 var httpClient = new HttpClient();
                 var respuesta = await httpClient.PutAsJsonAsync(urlApi, pCliente);
                 if (respuesta.IsSuccessStatusCode)
@@ -125,7 +125,7 @@ namespace Farmacia.BLL.Service
             try
             {
                 cApiBase mapi = new cApiBase();
-                urlApi = mapi.getWebApiUrl().ToString().Trim() + $"api/Cliente/eliminarcliente/{pIdCliente}";
+                urlApi = mapi.getWebApiUrl().ToString().Trim() + $"api/Cliente/deleteCliente/{pIdCliente}";
                 var httpClient = new HttpClient();
                 var respuesta = await httpClient.DeleteAsync(urlApi);
                 if (respuesta.IsSuccessStatusCode)

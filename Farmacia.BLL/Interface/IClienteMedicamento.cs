@@ -11,9 +11,9 @@ namespace Farmacia.BLL.Interface
     {
 
         Task<List<cClienteMedicamento>> getClienteMedicamentos();
-        Task<cClienteMedicamento> getClienteMedicamento(string pIdClienteMedicamento);
         Task<bool> agregarClienteMedicamento(cClienteMedicamento pClienteMedicamento);
         Task<bool> actualizarClienteMedicamento(cClienteMedicamento pClienteMedicamento);
-        Task<bool> eliminarClienteMedicamento(string pIdClienteMedicamento);
+        Task<cClienteMedicamento> getClienteMedicamento(string idCliente, string idMedicamento);
+        Task<bool> eliminarClienteMedicamento(string idCliente, string idMedicamento);
     }
 }

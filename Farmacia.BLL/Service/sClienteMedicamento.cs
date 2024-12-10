@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Text.Json;
 using System.Net.Http.Json;
+using Farmacia.Share.Service;
 
 namespace Farmacia.BLL.Service
 {
@@ -20,7 +21,7 @@ namespace Farmacia.BLL.Service
             try
             {
                 cApiBase mapi = new cApiBase();
-                urlApi = mapi.getWebApiUrl().ToString().Trim() + "api/ClienteMedicamento/getclientemedicamentos";
+                urlApi = mapi.getWebApiUrl().ToString().Trim() + "api/ClienteMedicamento/getclientesmedicamentos";
                 var httpClient = new HttpClient();
                 var respuesta = await httpClient.GetAsync(urlApi);
                 if (respuesta.IsSuccessStatusCode)
@@ -43,12 +44,12 @@ namespace Farmacia.BLL.Service
 
         //****************************************************************************
 
-        public async Task<cClienteMedicamento> getClienteMedicamento(string pIdClienteMedicamento)
+        public async Task<cClienteMedicamento> getClienteMedicamento(string idCliente, string idMedicamento)
         {
             try
             {
                 cApiBase mapi = new cApiBase();
-                urlApi = mapi.getWebApiUrl().ToString().Trim() + $"api/ClienteMedicamento/getclientemedicamento/{pIdClienteMedicamento}";
+                urlApi = mapi.getWebApiUrl().ToString().Trim() + $"api/ClienteMedicamento/getclientemedicamento/{idCliente}/{idMedicamento}";
                 var httpClient = new HttpClient();
                 var respuesta = await httpClient.GetAsync(urlApi);
                 if (respuesta.IsSuccessStatusCode)
@@ -74,7 +75,7 @@ namespace Farmacia.BLL.Service
             try
             {
                 cApiBase mapi = new cApiBase();
-                urlApi = mapi.getWebApiUrl().ToString().Trim() + "api/ClienteMedicamento/agregarclientemedicamento";
+                urlApi = mapi.getWebApiUrl().ToString().Trim() + "api/ClienteMedicamento/insertclientemedicamento";
                 var httpClient = new HttpClient();
                 var respuesta = await httpClient.PostAsJsonAsync(urlApi, pClienteMedicamento);
                 if (respuesta.IsSuccessStatusCode)
@@ -99,7 +100,7 @@ namespace Farmacia.BLL.Service
             try
             {
                 cApiBase mapi = new cApiBase();
-                urlApi = mapi.getWebApiUrl().ToString().Trim() + "api/ClienteMedicamento/actualizarclientemedicamento";
+                urlApi = mapi.getWebApiUrl().ToString().Trim() + "api/ClienteMedicamento/updateclientemedicamento";
                 var httpClient = new HttpClient();
                 var respuesta = await httpClient.PutAsJsonAsync(urlApi, pClienteMedicamento);
                 if (respuesta.IsSuccessStatusCode)
@@ -119,12 +120,12 @@ namespace Farmacia.BLL.Service
 
         //****************************************************************************
 
-        public async Task<bool> eliminarClienteMedicamento(string pIdClienteMedicamento)
+        public async Task<bool> eliminarClienteMedicamento(string idCliente, string idMedicamento)
         {
             try
             {
                 cApiBase mapi = new cApiBase();
-                urlApi = mapi.getWebApiUrl().ToString().Trim() + $"api/ClienteMedicamento/eliminarclientemedicamento/{pIdClienteMedicamento}";
+                urlApi = mapi.getWebApiUrl().ToString().Trim() + $"api/ClienteMedicamento/deleteclientemedicamento/{idCliente}/{idMedicamento}";
                 var httpClient = new HttpClient();
                 var respuesta = await httpClient.DeleteAsync(urlApi);
                 if (respuesta.IsSuccessStatusCode)

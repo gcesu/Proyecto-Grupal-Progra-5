@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 // Importaciones de los modelos y servicios
 using Farmacia.Share.Model;     
 using Farmacia.Share.Service;
+using System.Data.SqlClient;
 
 namespace Farmacia.WebAPI.Controllers
 {
@@ -37,13 +38,14 @@ namespace Farmacia.WebAPI.Controllers
 
         //********************************************************************
         [HttpGet]
-        [Route("getcliente/{idCliente}")]
-        public async Task<ActionResult<cCliente>> getCliente(string idCliente)
+        [Route("getcliente")]
+        public async Task<ActionResult<cCliente>> getCliente(string Identificacion)
         {
             try
             {
-                dsCliente mdsCliente = new dsCliente(sqlConnectionString);
-                cCliente mCliente = await mdsCliente.getCliente(idCliente);
+                dsCliente mdsCl = new dsCliente(sqlConnectionString);
+                cCliente mCliente = await mdsCl.getCliente(Identificacion);
+
                 if (mCliente == null)
                 {
                     return NotFound();
@@ -51,13 +53,13 @@ namespace Farmacia.WebAPI.Controllers
                 else
                 {
                     return Ok(mCliente);
-
                 }
 
             }
             catch (Exception ex)
             {
                 return BadRequest(ex.Message);
+
             }
         }
 

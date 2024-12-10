@@ -46,8 +46,8 @@ namespace Farmacia.Share.Service
             {
                 var db = dbcon();
                 var sql = @"SELECT IdMedicamento, Descripcion, Presentacion, Marca, Estado FROM Medicamento WHERE IdMedicamento = @IdMedicamento;";
-                var resultado = await db.QueryFirstOrDefaultAsync<cMedicamento>(sql.ToString(), new { pIdMedicamento });
-                return resultado;
+                var resultado = await db.QueryAsync<cMedicamento>(sql.ToString(), new { IdMedicamento = pIdMedicamento });
+                return resultado.FirstOrDefault();
             }
             catch (Exception ex)
             {

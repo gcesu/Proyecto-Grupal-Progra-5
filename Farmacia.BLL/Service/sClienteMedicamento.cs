@@ -11,7 +11,7 @@ using System.Net.Http.Json;
 
 namespace Farmacia.BLL.Service
 {
-    public class sClienteMedicamento
+    public class sClienteMedicamento:IClienteMedicamento
     {
         private string urlApi = "";
 

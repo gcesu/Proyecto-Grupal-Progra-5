@@ -53,7 +53,7 @@ namespace Farmacia.BLL.Service
             try
             {
                 cApiBase mapi = new cApiBase();
-                urlApi = mapi.getWebApiUrl().ToString().Trim() + $"api/Cliente/getcliente";
+                urlApi = mapi.getWebApiUrl().ToString().Trim() + $"api/Cliente/getcliente/{pIdCliente}";
                 var httpClient = new HttpClient();
                 var respuesta = await httpClient.GetAsync(urlApi);
                 if (respuesta.IsSuccessStatusCode)

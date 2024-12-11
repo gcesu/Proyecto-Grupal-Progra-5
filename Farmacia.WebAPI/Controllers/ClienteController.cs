@@ -38,30 +38,22 @@ namespace Farmacia.WebAPI.Controllers
 
         //********************************************************************
         [HttpGet]
-        [Route("getcliente")]
-        public async Task<ActionResult<cCliente>> getCliente(string Identificacion)
+        [Route("getcliente/{identificacion}")]
+        public async Task<ActionResult<cCliente>> getCliente(string identificacion)
         {
             try
             {
-                dsCliente mdsCl = new dsCliente(sqlConnectionString);
-                cCliente mCliente = await mdsCl.getCliente(Identificacion);
+                dsCliente mdsCliente = new dsCliente(sqlConnectionString);
+                cCliente mCliente = await mdsCliente.getCliente(identificacion);
 
-                if (mCliente == null)
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    return Ok(mCliente);
-                }
-
+                return Ok(mCliente);
             }
             catch (Exception ex)
             {
                 return BadRequest(ex.Message);
-
             }
         }
+
 
         //********************************************************************
         [HttpPost]

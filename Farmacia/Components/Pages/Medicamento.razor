@@ -1,12 +1,12 @@
 ﻿@page "/medicamentos"
 @using Farmacia.Share.Model;
-@using Farmacia.BLL.Interface
-@using Farmacia.BLL.Model
+@using Farmacia.BLL.Interface;
+@using Farmacia.BLL.Model;
 @inject IMedicamento mdsMedicamentos;
 @inject NotificationService Notification;
+@inject DialogService DialogService;
 
 <h1>Medicamentos</h1>
-
 
 <div class="container mt-4">
     <div class="row justify-content-center">
@@ -18,75 +18,26 @@
                     <RadzenDataGridColumn Property="@nameof(cMedicamento.Descripcion)" Title="Descripcion"></RadzenDataGridColumn>
                     <RadzenDataGridColumn Property="@nameof(cMedicamento.Presentacion)" Title="Presentacion"></RadzenDataGridColumn>
                     <RadzenDataGridColumn Property="@nameof(cMedicamento.Marca)" Title="Marca"></RadzenDataGridColumn>
-                    <RadzenDataGridColumn Property="@nameof(cMedicamento.Estado)" Title="Estado"></RadzenDataGridColumn>    
+                    <RadzenDataGridColumn Property="@nameof(cMedicamento.Estado)" Title="Estado"></RadzenDataGridColumn>
                 </Columns>
             </RadzenDataGrid>
         </div>
 
         <div class="row" style="margin: 10px">
             <div class="col-md-4 col-lg-4 col-xl-4 col-xxl-4 col-sm-12 col-xs-12" style="margin: 5px">
-                <RadzenButton ButtonStyle="ButtonStyle.Primary" Text="Editar" Click="@EditarMedicamento" />
+                <RadzenButton ButtonStyle="ButtonStyle.Primary" Text="Agregar" Click="@AgregarMedicamento" />
             </div>
-
+            <div class="col-md-4 col-lg-4 col-xl-4 col-xxl-4 col-sm-12 col-xs-12" style="margin: 5px">
+                <RadzenButton ButtonStyle="ButtonStyle.Secondary" Text="Actualizar" Click="@ActualizarMedicamento" />
+            </div>
             <div class="col-md-4 col-lg-4 col-xl-4 col-xxl-4 col-sm-12 col-xs-12" style="margin: 5px">
                 <RadzenButton ButtonStyle="ButtonStyle.Danger" Text="Eliminar" Click="@EliminarMedicamento" />
             </div>
         </div>
-
     </div>
 </div>
-<style>
-    .container {
-        margin-bottom: 20px;
-    }
-</style>
-
-
-<div class="container mt-4">
-    <div class="container mt-4">
-        <div class="row justify-content-center">
-            <div class="col-md-6">
-                <RadzenCard>
-                    <RadzenFieldset style="margin: 3px">
-                        <div class="form-group">
-                            <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Digite la Descripcion</RadzenText>
-                            <RadzenTextBox @bind-Value="@mMedicamento.Descripcion" style="width: 100%" aria-label="Descripcion" />
-                        </div>
-                        <div class="form-group">
-                            <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Digite la Presentacion</RadzenText>
-                            <RadzenTextBox @bind-Value="@mMedicamento.Presentacion" style="width: 100%" aria-label="Presentacion" />
-                        </div>
-
-                        <div class="form-group">
-                            <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Digite la Marca</RadzenText>
-                            <RadzenTextBox @bind-Value="@mMedicamento.Marca" style="width: 100%" aria-label="Marca" />
-                        </div>
-
-                        <div class="form-group">
-                            <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Digite el Estado</RadzenText>
-                            <RadzenTextBox @bind-Value="@mMedicamento.Estado" style="width: 100%" aria-label="Estado" />
-                        </div>
-
-                        <div class="row" style="margin-top: 10px;">
-                            <div class="col-md-4 col-lg-4 col-xl-4 col-xxl-4 col-sm-12 col-xs-12" style="margin: 5px">
-                                <RadzenButton ButtonStyle="ButtonStyle.Primary" Text="Agregar" Click="@AgregarMedicamento" />
-                            </div>
-                            <div class="col-md-4 col-lg-4 col-xl-4 col-xxl-4 col-sm-12 col-xs-12" style="margin: 5px">
-                                <RadzenButton ButtonStyle="ButtonStyle.Secondary" Text="Actualizar" Click="@ActualizarMedicamento" />
-                            </div>
-
-                        </div>
-                    </RadzenFieldset>
-                </RadzenCard>
-            </div>
-        </div>
-    </div>
-</div>
-
 
 @code {
-
-
     List<cMedicamento> mListaMedicamentos;
     IList<cMedicamento> mMedicamentoSeleccionado;
     cMedicamento mMedicamento = new cMedicamento();
@@ -98,10 +49,11 @@
 
     private async Task AgregarMedicamento()
     {
-        if (await mdsMedicamentos.agregarMedicamento(mMedicamento) == true)
+        var result = await DialogService.OpenAsync<MedicamentoDialog>("Agregar Medicamento", new Dictionary<string, object>());
+
+        if (result != null && (bool)result)
         {
             mListaMedicamentos = await mdsMedicamentos.getMedicamentos();
-            mMedicamento = new cMedicamento();
             StateHasChanged();
             Notification.Notify(new NotificationMessage
                 {
@@ -121,23 +73,36 @@
         }
     }
 
-    private async Task EditarMedicamento()
-    {
-        mMedicamento = mMedicamentoSeleccionado.FirstOrDefault();
-    }
-
     private async Task ActualizarMedicamento()
     {
-        if (await mdsMedicamentos.actualizarMedicamento(mMedicamento) == true)
+        if (mMedicamentoSeleccionado == null || !mMedicamentoSeleccionado.Any())
+        {
+            Notification.Notify(new NotificationMessage
+                {
+                    Severity = NotificationSeverity.Warning,
+                    Summary = "Advertencia",
+                    Detail = "Debe seleccionar un medicamento para actualizar"
+                });
+            return;
+        }
+
+        mMedicamento = mMedicamentoSeleccionado.FirstOrDefault();
+        var result = await DialogService.OpenAsync<MedicamentoDialog>("Actualizar Medicamento", new Dictionary<string, object>
+    {
+        { "Medicamento", mMedicamento }
+    });
+
+        if (result != null && (bool)result)
         {
             mListaMedicamentos = await mdsMedicamentos.getMedicamentos();
-            mMedicamento = new cMedicamento();
+            mMedicamentoSeleccionado = null;
             StateHasChanged();
+
             Notification.Notify(new NotificationMessage
                 {
                     Severity = NotificationSeverity.Success,
-                    Summary = "Medicamento Editado",
-                    Detail = "El Medicamento se ha editado correctamente"
+                    Summary = "Medicamento Actualizado",
+                    Detail = "El Medicamento se ha actualizado correctamente"
                 });
         }
         else
@@ -146,37 +111,50 @@
                 {
                     Severity = NotificationSeverity.Error,
                     Summary = "Error",
-                    Detail = "Error al editar el Medicamento"
+                    Detail = "Error al actualizar el Medicamento"
                 });
         }
     }
 
+
     private async Task EliminarMedicamento()
     {
-        if (mMedicamentoSeleccionado.FirstOrDefault() != null)
+
+        if (mMedicamentoSeleccionado == null || !mMedicamentoSeleccionado.Any())
         {
-            int idMedicamento = mMedicamentoSeleccionado.FirstOrDefault().IdMedicamento;
-            if (await mdsMedicamentos.eliminarMedicamento(idMedicamento.ToString()) == true)
-            {
-                mListaMedicamentos = await mdsMedicamentos.getMedicamentos();
-                mMedicamento = new cMedicamento();
-                StateHasChanged();
-                Notification.Notify(new NotificationMessage
+            Notification.Notify(new NotificationMessage
+                {
+                    Severity = NotificationSeverity.Warning,
+                    Summary = "Advertencia",
+                    Detail = "Debe seleccionar un medicamento para eliminar"
+                });
+            return;
+        }
+
+        var medicamento = mMedicamentoSeleccionado.FirstOrDefault();
+        int idMedicamento = medicamento.IdMedicamento;
+
+        if (await mdsMedicamentos.eliminarMedicamento(idMedicamento.ToString()) == true)
+        {
+            mListaMedicamentos = await mdsMedicamentos.getMedicamentos();
+            mMedicamento = new cMedicamento();
+            mMedicamentoSeleccionado = null;
+            StateHasChanged();
+            Notification.Notify(new NotificationMessage
                 {
                     Severity = NotificationSeverity.Success,
                     Summary = "Medicamento Eliminado",
                     Detail = "El Medicamento se ha eliminado correctamente"
                 });
-            }
-            else
-            {
-                Notification.Notify(new NotificationMessage
+        }
+        else
+        {
+            Notification.Notify(new NotificationMessage
                 {
                     Severity = NotificationSeverity.Error,
                     Summary = "Error",
                     Detail = "Error al eliminar el Medicamento"
                 });
-            }
         }
     }
 

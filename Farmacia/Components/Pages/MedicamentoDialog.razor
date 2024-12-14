@@ -1,0 +1,77 @@
+﻿@page "/medicamento-dialog"
+@using Farmacia.Share.Model;
+@using Farmacia.BLL.Interface;
+@inject IMedicamento mdsMedicamentos;
+@inject DialogService DialogService;
+@inject NotificationService Notification;
+
+<EditForm Model="@mMedicamento" OnValidSubmit="@HandleValidSubmit">
+    <RadzenCard>
+        <RadzenFieldset style="margin: 3px">
+            <div class="form-group">
+                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Digite la Descripcion</RadzenText>
+                <RadzenTextBox @bind-Value="@mMedicamento.Descripcion" style="width: 100%" aria-label="Descripcion" />
+            </div>
+            <div class="form-group">
+                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Digite la Presentacion</RadzenText>
+                <RadzenTextBox @bind-Value="@mMedicamento.Presentacion" style="width: 100%" aria-label="Presentacion" />
+            </div>
+            <div class="form-group">
+                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Digite la Marca</RadzenText>
+                <RadzenTextBox @bind-Value="@mMedicamento.Marca" style="width: 100%" aria-label="Marca" />
+            </div>
+            <div class="form-group">
+                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Digite el Estado</RadzenText>
+                <RadzenTextBox @bind-Value="@mMedicamento.Estado" style="width: 100%" aria-label="Estado" />
+            </div>
+            <div class="row" style="margin-top: 10px;">
+                <div class="col-md-4 col-lg-4 col-xl-4 col-xxl-4 col-sm-12 col-xs-12" style="margin: 5px">
+                    <RadzenButton ButtonStyle="ButtonStyle.Primary" Text="Guardar" ButtonType="ButtonType.Submit" />
+                </div>
+                <div class="col-md-4 col-lg-4 col-xl-4 col-xxl-4 col-sm-12 col-xs-12" style="margin: 5px">
+                    <RadzenButton ButtonStyle="ButtonStyle.Secondary" Text="Cancelar" Click="@Cancelar" />
+                </div>
+            </div>
+        </RadzenFieldset>
+    </RadzenCard>
+</EditForm>
+
+@code {
+    [Parameter] public cMedicamento Medicamento { get; set; }
+    private cMedicamento mMedicamento;
+
+    protected override void OnInitialized()
+    {
+        if (Medicamento != null)
+        {
+            mMedicamento = Medicamento;
+        }
+        else
+        {
+            mMedicamento = new cMedicamento();
+        }
+    }
+
+    private async Task HandleValidSubmit()
+    {
+        bool result;
+        if (mMedicamento.IdMedicamento == 0)
+        {
+            result = await mdsMedicamentos.agregarMedicamento(mMedicamento);
+        }
+        else
+        {
+            result = await mdsMedicamentos.actualizarMedicamento(mMedicamento);
+        }
+
+        if (result)
+        {
+            DialogService.Close(true);
+        }
+    }
+
+    private void Cancelar()
+    {
+        DialogService.Close(false);
+    }
+}

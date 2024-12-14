@@ -1,0 +1,96 @@
+﻿@page "/agregarclientemedicamentodialog"
+
+@using Farmacia.Share.Model;
+@using Farmacia.BLL.Interface
+@inject IClienteMedicamento mdsClientesMedicamentos;
+@inject NotificationService Notification;
+@inject DialogService DialogService;
+
+<RadzenTemplateForm Data="@mClienteMedicamento" TItem="cClienteMedicamento" Submit="@FormSubmit">
+    <RadzenFieldset style="margin: 3px">
+        <div class="form-group">
+            <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Digite la Identificacion</RadzenText>
+            <RadzenTextBox @bind-Value="@mClienteMedicamento.Identificacion" style="width: 100%" aria-label="Identificacion" />
+        </div>
+        <div class="form-group">
+            <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Digite el IdMedicamento</RadzenText>
+            <RadzenNumeric @bind-Value="@mClienteMedicamento.IdMedicamento" style="width: 100%" aria-label="IdMedicamento" />
+        </div>
+        <div class="form-group">
+            <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Digite la Dosis</RadzenText>
+            <RadzenTextBox @bind-Value="@mClienteMedicamento.Dosis" style="width: 100%" aria-label="Dosis" />
+        </div>
+        <div class="row" style="margin-top: 10px;">
+            <div class="col-md-4 col-lg-4 col-xl-4 col-xxl-4 col-sm-12 col-xs-12" style="margin: 5px">
+                <RadzenButton ButtonStyle="ButtonStyle.Primary" Text="Guardar" Click="@FormSubmit" />
+            </div>
+        </div>
+    </RadzenFieldset>
+</RadzenTemplateForm>
+
+@code {
+    [Parameter] public cClienteMedicamento ClienteMedicamento { get; set; }
+    cClienteMedicamento mClienteMedicamento = new cClienteMedicamento();
+
+    protected override void OnParametersSet()
+    {
+        if (ClienteMedicamento != null)
+        {
+            mClienteMedicamento = ClienteMedicamento;
+        }
+        else
+        {
+            mClienteMedicamento = new cClienteMedicamento();
+        }
+    }
+
+    private async Task FormSubmit()
+    {
+        if (ClienteMedicamento == null)
+        {
+            if (await mdsClientesMedicamentos.agregarClienteMedicamento(mClienteMedicamento) == true)
+            {
+                Notification.Notify(new NotificationMessage
+                    {
+                        Severity = NotificationSeverity.Success,
+                        Summary = "Medicamento Agregado",
+                        Detail = "El Medicamento se ha agregado correctamente"
+                    });
+                DialogService.Close(true);
+            }
+            else
+            {
+                Notification.Notify(new NotificationMessage
+                    {
+                        Severity = NotificationSeverity.Error,
+                        Summary = "Error",
+                        Detail = "Error al agregar el Medicamento"
+                    });
+                DialogService.Close(false);
+            }
+        }
+        else
+        {
+            if (await mdsClientesMedicamentos.actualizarClienteMedicamento(mClienteMedicamento) == true)
+            {
+                Notification.Notify(new NotificationMessage
+                    {
+                        Severity = NotificationSeverity.Success,
+                        Summary = "Medicamento Actualizado",
+                        Detail = "El Medicamento se ha actualizado correctamente"
+                    });
+                DialogService.Close(true);
+            }
+            else
+            {
+                Notification.Notify(new NotificationMessage
+                    {
+                        Severity = NotificationSeverity.Error,
+                        Summary = "Error",
+                        Detail = "Error al actualizar el Medicamento"
+                    });
+                DialogService.Close(false);
+            }
+        }
+    }
+}

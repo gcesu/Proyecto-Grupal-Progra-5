@@ -120,12 +120,12 @@ namespace Farmacia.BLL.Service
 
         //****************************************************************************
 
-        public async Task<bool> eliminarClienteMedicamento(string idCliente, string idMedicamento)
+        public async Task<bool> eliminarClienteMedicamento(cClienteMedicamento pClienteMedicamento)
         {
             try
             {
                 cApiBase mapi = new cApiBase();
-                urlApi = mapi.getWebApiUrl().ToString().Trim() + $"api/ClienteMedicamento/deleteclientemedicamento/{idCliente}/{idMedicamento}";
+                urlApi = mapi.getWebApiUrl().ToString().Trim() + $"api/ClienteMedicamento/deleteclientemedicamento/{pClienteMedicamento.Identificacion}/{pClienteMedicamento.IdMedicamento}";
                 var httpClient = new HttpClient();
                 var respuesta = await httpClient.DeleteAsync(urlApi);
                 if (respuesta.IsSuccessStatusCode)

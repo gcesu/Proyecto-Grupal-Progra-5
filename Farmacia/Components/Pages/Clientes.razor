@@ -111,32 +111,32 @@
     }
 
     private async Task BuscarCliente()
-{
-    var result = await DialogService.OpenAsync<BuscarClienteDialog>("Buscar Cliente");
-
-    cCliente mClienteEncontradoResultado = result as cCliente;
-
-    if (result != null)
     {
-        mClienteEncontrado = mClienteEncontradoResultado; 
-        StateHasChanged();
+        var result = await DialogService.OpenAsync<BuscarClienteDialog>("Buscar Cliente");
 
-        Notification.Notify(new NotificationMessage
+        cCliente mClienteEncontradoResultado = result as cCliente;
+
+        @if (result != null && mClienteEncontradoResultado.FechaNacimiento != DateTime.MinValue)
+        {    
+            mClienteEncontrado = mClienteEncontradoResultado; 
+            StateHasChanged();
+
+            Notification.Notify(new NotificationMessage
+            {
+                Severity = NotificationSeverity.Success,
+                Summary = "Cliente Encontrado",
+                Detail = $"Cliente {mClienteEncontrado.Nombre} encontrado"
+            });
+        }
+        else
         {
-            Severity = NotificationSeverity.Success,
-            Summary = "Cliente Encontrado",
-            Detail = $"Cliente {mClienteEncontrado.Nombre} encontrado"
-        });
+            Notification.Notify(new NotificationMessage
+            {
+                Severity = NotificationSeverity.Warning,
+                Summary = "No Encontrado",
+                Detail = "No se encontró un cliente con esa identificación"
+            });
+        }
     }
-    else
-    {
-        Notification.Notify(new NotificationMessage
-        {
-            Severity = NotificationSeverity.Warning,
-            Summary = "No Encontrado",
-            Detail = "No se encontró un cliente con esa identificación"
-        });
-    }
-}
 
 }

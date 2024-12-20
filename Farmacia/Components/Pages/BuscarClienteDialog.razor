@@ -54,7 +54,7 @@
         // Buscar cliente usando el método existente
         mClienteEncontrado = await mdsClientes.getCliente(mBusqueda.Identificacion);
 
-        if (mClienteEncontrado != null)
+        if (mClienteEncontrado != null && mClienteEncontrado.FechaNacimiento != DateTime.MinValue)
         {
             Notification.Notify(new NotificationMessage
                 {

@@ -1,0 +1,88 @@
+﻿@page "/buscarmedicamentodialog"
+@using Farmacia.Share.Model;
+@using Farmacia.BLL.Interface;
+@inject IMedicamento mdsMedicamentos;
+@inject NotificationService Notification;
+@inject DialogService DialogService;
+
+<RadzenTemplateForm Data="@mBusqueda" TItem="cMedicamento" Submit="@BuscarMedicamento">
+    <RadzenFieldset Style="margin: 10px; padding: 10px;">
+        <div class="form-group">
+            <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Buscar Medicamento</RadzenText>
+            <RadzenNumeric @bind-Value="@mBusqueda.IdMedicamento" Placeholder="Ingrese el ID del Medicamento" Style="width: 100%;" />
+        </div>
+        <div style="margin-top: 10px;">
+            <RadzenButton ButtonStyle="ButtonStyle.Primary" Text="Buscar" Click="@BuscarMedicamento" />
+            <RadzenButton ButtonStyle="ButtonStyle.Secondary" Text="Cerrar" Style="margin-left: 10px;" Click="@CerrarDialogo" />
+        </div>
+    </RadzenFieldset>
+</RadzenTemplateForm>
+
+@if (mMedicamentoEncontrado != null)
+{
+    <RadzenCard Style="background-color: #e3f2fd; padding: 10px; margin-top: 10px;">
+        <h4>Información del Medicamento</h4>
+        <p><strong>ID:</strong> @mMedicamentoEncontrado.IdMedicamento</p>
+        <p><strong>Descripción:</strong> @mMedicamentoEncontrado.Descripcion</p>
+        <p><strong>Presentación:</strong> @mMedicamentoEncontrado.Presentacion</p>
+        <p><strong>Marca:</strong> @mMedicamentoEncontrado.Marca</p>
+        <p><strong>Estado:</strong> @mMedicamentoEncontrado.Estado</p>
+    </RadzenCard>
+
+    <div style="margin-top: 10px;">
+        <RadzenButton ButtonStyle="ButtonStyle.Primary" Text="Aceptar" Click="@SeleccionarMedicamento" />
+    </div>
+}
+
+@code {
+    private cMedicamento mBusqueda = new cMedicamento();
+    private cMedicamento mMedicamentoEncontrado = null;
+
+    private async Task BuscarMedicamento()
+    {
+        if (mBusqueda.IdMedicamento <= 0)
+        {
+            Notification.Notify(new NotificationMessage
+                {
+                    Severity = NotificationSeverity.Warning,
+                    Summary = "Advertencia",
+                    Detail = "Debe ingresar un ID válido"
+                });
+            return;
+        }
+
+        // Llamada al método de servicio para buscar el medicamento
+        mMedicamentoEncontrado = await mdsMedicamentos.getMedicamento(mBusqueda.IdMedicamento.ToString());
+
+        if (mMedicamentoEncontrado != null)
+        {
+            Notification.Notify(new NotificationMessage
+                {
+                    Severity = NotificationSeverity.Success,
+                    Summary = "Medicamento Encontrado",
+                    Detail = $"Se encontró el medicamento: {mMedicamentoEncontrado.Descripcion}"
+                });
+        }
+        else
+        {
+            Notification.Notify(new NotificationMessage
+                {
+                    Severity = NotificationSeverity.Error,
+                    Summary = "No Encontrado",
+                    Detail = "No se encontró un medicamento con ese ID"
+                });
+        }
+
+        StateHasChanged();
+    }
+
+    private void SeleccionarMedicamento()
+    {
+        DialogService.Close(mMedicamentoEncontrado); // Devuelve el medicamento encontrado al componente principal
+    }
+
+    private void CerrarDialogo()
+    {
+        DialogService.Close(null); // Cierra el diálogo sin devolver nada
+    }
+}

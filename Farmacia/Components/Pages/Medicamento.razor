@@ -1,7 +1,6 @@
 ﻿@page "/medicamentos"
 @using Farmacia.Share.Model;
 @using Farmacia.BLL.Interface;
-@using Farmacia.BLL.Model;
 @inject IMedicamento mdsMedicamentos;
 @inject NotificationService Notification;
 @inject DialogService DialogService;
@@ -12,7 +11,6 @@
     <div class="row justify-content-center">
         <div class="row">
             <RadzenDataGrid Data="@mListaMedicamentos" AllowSorting="true" Style="400px;" TItem="cMedicamento" AllowPaging="true" FilterPopupRenderMode="PopupRenderMode.OnDemand" PageSize="5" SelectionMode="DataGridSelectionMode.Single" @bind-Value=@mMedicamentoSeleccionado>
-
                 <Columns>
                     <RadzenDataGridColumn Property="@nameof(cMedicamento.IdMedicamento)" Title="IdMedicamento"></RadzenDataGridColumn>
                     <RadzenDataGridColumn Property="@nameof(cMedicamento.Descripcion)" Title="Descripcion"></RadzenDataGridColumn>
@@ -24,16 +22,31 @@
         </div>
 
         <div class="row" style="margin: 10px">
-            <div class="col-md-4 col-lg-4 col-xl-4 col-xxl-4 col-sm-12 col-xs-12" style="margin: 5px">
+            <div class="col-md-3">
                 <RadzenButton ButtonStyle="ButtonStyle.Primary" Text="Agregar" Click="@AgregarMedicamento" />
             </div>
-            <div class="col-md-4 col-lg-4 col-xl-4 col-xxl-4 col-sm-12 col-xs-12" style="margin: 5px">
+            <div class="col-md-3">
                 <RadzenButton ButtonStyle="ButtonStyle.Secondary" Text="Actualizar" Click="@ActualizarMedicamento" />
             </div>
-            <div class="col-md-4 col-lg-4 col-xl-4 col-xxl-4 col-sm-12 col-xs-12" style="margin: 5px">
+            <div class="col-md-3">
                 <RadzenButton ButtonStyle="ButtonStyle.Danger" Text="Eliminar" Click="@EliminarMedicamento" />
             </div>
+            <div class="col-md-3">
+                <RadzenButton ButtonStyle="ButtonStyle.Info" Text="Buscar" Click="@BuscarMedicamento" />
+            </div>
         </div>
+
+        @if (mMedicamentoEncontrado != null)
+        {
+            <RadzenCard Style="background-color: #e3f2fd; padding: 10px; margin-top: 10px;">
+                <h4>Información del Medicamento Encontrado</h4>
+                <p><strong>Id:</strong> @mMedicamentoEncontrado.IdMedicamento</p>
+                <p><strong>Descripción:</strong> @mMedicamentoEncontrado.Descripcion</p>
+                <p><strong>Presentación:</strong> @mMedicamentoEncontrado.Presentacion</p>
+                <p><strong>Marca:</strong> @mMedicamentoEncontrado.Marca</p>
+                <p><strong>Estado:</strong> @mMedicamentoEncontrado.Estado</p>
+            </RadzenCard>
+        }
     </div>
 </div>
 
@@ -41,6 +54,7 @@
     List<cMedicamento> mListaMedicamentos;
     IList<cMedicamento> mMedicamentoSeleccionado;
     cMedicamento mMedicamento = new cMedicamento();
+    cMedicamento mMedicamentoEncontrado = null; // Variable para almacenar el medicamento encontrado
 
     protected override async Task OnInitializedAsync()
     {
@@ -50,26 +64,11 @@
     private async Task AgregarMedicamento()
     {
         var result = await DialogService.OpenAsync<MedicamentoDialog>("Agregar Medicamento", new Dictionary<string, object>());
-
         if (result != null && (bool)result)
         {
             mListaMedicamentos = await mdsMedicamentos.getMedicamentos();
             StateHasChanged();
-            Notification.Notify(new NotificationMessage
-                {
-                    Severity = NotificationSeverity.Success,
-                    Summary = "Medicamento Agregado",
-                    Detail = "El Medicamento se ha agregado correctamente"
-                });
-        }
-        else
-        {
-            Notification.Notify(new NotificationMessage
-                {
-                    Severity = NotificationSeverity.Error,
-                    Summary = "Error",
-                    Detail = "Error al agregar el Medicamento"
-                });
+            Notification.Notify(new NotificationMessage { Severity = NotificationSeverity.Success, Summary = "Medicamento Agregado", Detail = "El Medicamento se ha agregado correctamente" });
         }
     }
 
@@ -77,85 +76,60 @@
     {
         if (mMedicamentoSeleccionado == null || !mMedicamentoSeleccionado.Any())
         {
-            Notification.Notify(new NotificationMessage
-                {
-                    Severity = NotificationSeverity.Warning,
-                    Summary = "Advertencia",
-                    Detail = "Debe seleccionar un medicamento para actualizar"
-                });
+            Notification.Notify(new NotificationMessage { Severity = NotificationSeverity.Warning, Summary = "Advertencia", Detail = "Debe seleccionar un medicamento para actualizar" });
             return;
         }
 
         mMedicamento = mMedicamentoSeleccionado.FirstOrDefault();
-        var result = await DialogService.OpenAsync<MedicamentoDialog>("Actualizar Medicamento", new Dictionary<string, object>
-    {
-        { "Medicamento", mMedicamento }
-    });
+        var result = await DialogService.OpenAsync<MedicamentoDialog>("Actualizar Medicamento", new Dictionary<string, object> { { "Medicamento", mMedicamento } });
 
         if (result != null && (bool)result)
         {
             mListaMedicamentos = await mdsMedicamentos.getMedicamentos();
             mMedicamentoSeleccionado = null;
             StateHasChanged();
-
-            Notification.Notify(new NotificationMessage
-                {
-                    Severity = NotificationSeverity.Success,
-                    Summary = "Medicamento Actualizado",
-                    Detail = "El Medicamento se ha actualizado correctamente"
-                });
-        }
-        else
-        {
-            Notification.Notify(new NotificationMessage
-                {
-                    Severity = NotificationSeverity.Error,
-                    Summary = "Error",
-                    Detail = "Error al actualizar el Medicamento"
-                });
+            Notification.Notify(new NotificationMessage { Severity = NotificationSeverity.Success, Summary = "Medicamento Actualizado", Detail = "El Medicamento se ha actualizado correctamente" });
         }
     }
 
-
     private async Task EliminarMedicamento()
     {
-
         if (mMedicamentoSeleccionado == null || !mMedicamentoSeleccionado.Any())
         {
-            Notification.Notify(new NotificationMessage
-                {
-                    Severity = NotificationSeverity.Warning,
-                    Summary = "Advertencia",
-                    Detail = "Debe seleccionar un medicamento para eliminar"
-                });
+            Notification.Notify(new NotificationMessage { Severity = NotificationSeverity.Warning, Summary = "Advertencia", Detail = "Debe seleccionar un medicamento para eliminar" });
             return;
         }
 
         var medicamento = mMedicamentoSeleccionado.FirstOrDefault();
-        int idMedicamento = medicamento.IdMedicamento;
-
-        if (await mdsMedicamentos.eliminarMedicamento(idMedicamento.ToString()) == true)
+        if (await mdsMedicamentos.eliminarMedicamento(medicamento.IdMedicamento.ToString()))
         {
             mListaMedicamentos = await mdsMedicamentos.getMedicamentos();
-            mMedicamento = new cMedicamento();
             mMedicamentoSeleccionado = null;
             StateHasChanged();
+            Notification.Notify(new NotificationMessage { Severity = NotificationSeverity.Success, Summary = "Medicamento Eliminado", Detail = "El Medicamento se ha eliminado correctamente" });
+        }
+    }
+
+    private async Task BuscarMedicamento()
+    {
+        var result = await DialogService.OpenAsync<BuscarMedicamentoDialog>("Buscar Medicamento");
+
+        cMedicamento mMedicamentoEncontradoResultado = result as cMedicamento;
+        if (result != null && mMedicamentoEncontradoResultado.IdMedicamento != 0)
+        {
+            mMedicamentoEncontrado = mMedicamentoEncontradoResultado;
+            StateHasChanged();
+
             Notification.Notify(new NotificationMessage
                 {
                     Severity = NotificationSeverity.Success,
-                    Summary = "Medicamento Eliminado",
-                    Detail = "El Medicamento se ha eliminado correctamente"
+                    Summary = "Medicamento Encontrado",
+                    Detail = $"Medicamento {mMedicamentoEncontrado.IdMedicamento} Medicamento"
                 });
         }
         else
         {
-            Notification.Notify(new NotificationMessage
-                {
-                    Severity = NotificationSeverity.Error,
-                    Summary = "Error",
-                    Detail = "Error al eliminar el Medicamento"
-                });
+            Notification.Notify(new NotificationMessage { Severity = NotificationSeverity.Warning, Summary = "No Encontrado", Detail = "No se encontró un medicamento con ese criterio." });
         }
     }
-
 }

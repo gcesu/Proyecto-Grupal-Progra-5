@@ -1,0 +1,84 @@
+﻿@page "/buscarclientedialog"
+@using Farmacia.Share.Model;
+@using Farmacia.BLL.Interface;
+@inject ICliente mdsClientes;
+@inject DialogService DialogService;
+@inject NotificationService Notification;
+
+<RadzenTemplateForm Data="@mBusqueda" TItem="cCliente" Submit="@BuscarCliente">
+    <RadzenFieldset style="margin: 3px">
+        <div class="form-group">
+            <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Digite la Identificación</RadzenText>
+            <RadzenTextBox @bind-Value="@mBusqueda.Identificacion" style="width: 100%" aria-label="Identificación" />
+        </div>
+        <div class="row" style="margin-top: 10px;">
+            <RadzenButton ButtonStyle="ButtonStyle.Primary" Text="Buscar" Click="@BuscarCliente" />
+        </div>
+    </RadzenFieldset>
+</RadzenTemplateForm>
+
+@if (mClienteEncontrado != null)
+{
+    <RadzenCard Style="background-color: #e3f2fd; padding: 10px; margin-top: 10px;">
+        <h4>Información del Cliente</h4>
+        <p><strong>Identificación:</strong> @mClienteEncontrado.Identificacion</p>
+        <p><strong>Nombre:</strong> @mClienteEncontrado.Nombre</p>
+        <p><strong>Fecha de Nacimiento:</strong> @mClienteEncontrado.FechaNacimiento.ToShortDateString()</p>
+        <p><strong>Teléfono:</strong> @mClienteEncontrado.Telefono</p>
+        <p><strong>Email:</strong> @mClienteEncontrado.Email</p>
+        <p><strong>Estado:</strong> @mClienteEncontrado.Estado</p>
+    </RadzenCard>
+
+    <div style="margin-top: 10px;">
+        <RadzenButton ButtonStyle="ButtonStyle.Primary" Text="Aceptar" Click="@CerrarDialogo" />
+    </div>
+}
+
+@code {
+    private cCliente mBusqueda = new cCliente();
+    private cCliente mClienteEncontrado;
+
+    private async Task BuscarCliente()
+    {
+        if (string.IsNullOrEmpty(mBusqueda.Identificacion))
+        {
+            Notification.Notify(new NotificationMessage
+                {
+                    Severity = NotificationSeverity.Warning,
+                    Summary = "Advertencia",
+                    Detail = "Debe ingresar una identificación válida"
+                });
+            return;
+        }
+
+        // Buscar cliente usando el método existente
+        mClienteEncontrado = await mdsClientes.getCliente(mBusqueda.Identificacion);
+
+        if (mClienteEncontrado != null && mClienteEncontrado.FechaNacimiento != DateTime.MinValue)
+        {
+            Notification.Notify(new NotificationMessage
+                {
+                    Severity = NotificationSeverity.Success,
+                    Summary = "Cliente Encontrado",
+                    Detail = $"Cliente {mClienteEncontrado.Nombre} encontrado"
+                });
+        }
+        else
+        {
+            Notification.Notify(new NotificationMessage
+                {
+                    Severity = NotificationSeverity.Error,
+                    Summary = "No Encontrado",
+                    Detail = "No se encontró un cliente con esa identificación"
+                });
+        }
+
+        StateHasChanged();
+    }
+
+    private void CerrarDialogo()
+    {
+        DialogService.Close(mClienteEncontrado); // Devuelve el cliente encontrado
+    }
+
+}

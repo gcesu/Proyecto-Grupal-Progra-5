@@ -11,8 +11,9 @@
 <div class="container mt-4">
     <div class="row justify-content-center">
         <div class="row">
-            <RadzenDataGrid Data="@mListaClientes" AllowSorting="true" Style="400px;" TItem="cCliente" AllowPaging="true" FilterPopupRenderMode="PopupRenderMode.OnDemand" PageSize="5" SelectionMode="DataGridSelectionMode.Single" @bind-Value=@mClienteSeleccionado>
-
+            <RadzenDataGrid Data="@mListaClientes" AllowSorting="true" Style="400px;" TItem="cCliente" AllowPaging="true"
+                            FilterPopupRenderMode="PopupRenderMode.OnDemand" PageSize="5"
+                            SelectionMode="DataGridSelectionMode.Single" @bind-Value=@mClienteSeleccionado>
                 <Columns>
                     <RadzenDataGridColumn Property="@nameof(cCliente.Identificacion)" Title="ID"></RadzenDataGridColumn>
                     <RadzenDataGridColumn Property="@nameof(cCliente.Nombre)" Title="Cliente"></RadzenDataGridColumn>
@@ -24,17 +25,35 @@
             </RadzenDataGrid>
         </div>
 
+        <!-- Botones de Acción -->
         <div class="row" style="margin: 10px">
-            <div class="col-md-4 col-lg-4 col-xl-4 col-xxl-4 col-sm-12 col-xs-12" style="margin: 5px">
+            <div class="col-md-3">
                 <RadzenButton ButtonStyle="ButtonStyle.Primary" Text="Agregar" Click="@AgregarCliente" />
             </div>
-            <div class="col-md-4 col-lg-4 col-xl-4 col-xxl-4 col-sm-12 col-xs-12" style="margin: 5px">
+            <div class="col-md-3">
                 <RadzenButton ButtonStyle="ButtonStyle.Secondary" Text="Actualizar" Click="@ActualizarCliente" />
             </div>
-            <div class="col-md-4 col-lg-4 col-xl-4 col-xxl-4 col-sm-12 col-xs-12" style="margin: 5px">
+            <div class="col-md-3">
                 <RadzenButton ButtonStyle="ButtonStyle.Danger" Text="Eliminar" Click="@EliminarCliente" />
             </div>
+            <div class="col-md-3">
+                <RadzenButton ButtonStyle="ButtonStyle.Info" Text="Buscar" Click="@BuscarCliente" />
+            </div>
         </div>
+
+        <!-- Mostrar información del cliente encontrado -->
+        @if (mClienteEncontrado != null)
+        {
+            <RadzenCard Style="background-color: #e3f2fd; padding: 10px; margin-top: 10px;">
+                <h4>Información del Cliente Encontrado</h4>
+                <p><strong>Identificación:</strong> @mClienteEncontrado.Identificacion</p>
+                <p><strong>Nombre:</strong> @mClienteEncontrado.Nombre</p>
+                <p><strong>Fecha de Nacimiento:</strong> @mClienteEncontrado.FechaNacimiento.ToShortDateString()</p>
+                <p><strong>Teléfono:</strong> @mClienteEncontrado.Telefono</p>
+                <p><strong>Email:</strong> @mClienteEncontrado.Email</p>
+                <p><strong>Estado:</strong> @mClienteEncontrado.Estado</p>
+            </RadzenCard>
+        }
     </div>
 </div>
 
@@ -42,6 +61,7 @@
     List<cCliente> mListaClientes;
     IList<cCliente> mClienteSeleccionado;
     cCliente mCliente = new cCliente();
+    cCliente mClienteEncontrado = null; // Inicializada correctamente
 
     protected override async Task OnInitializedAsync()
     {
@@ -56,103 +76,67 @@
         {
             mListaClientes = await mdsClientes.getClientes();
             StateHasChanged();
-            Notification.Notify(new NotificationMessage
-                {
-                    Severity = NotificationSeverity.Success,
-                    Summary = "Cliente Agregado",
-                    Detail = "El Cliente se ha agregado correctamente"
-                });
-        }
-        else
-        {
-            Notification.Notify(new NotificationMessage
-                {
-                    Severity = NotificationSeverity.Error,
-                    Summary = "Error",
-                    Detail = "Error al agregar el Cliente"
-                });
         }
     }
 
     private async Task ActualizarCliente()
     {
         if (mClienteSeleccionado == null || !mClienteSeleccionado.Any())
-        {
-            Notification.Notify(new NotificationMessage
-                {
-                    Severity = NotificationSeverity.Warning,
-                    Summary = "Advertencia",
-                    Detail = "Debe seleccionar un cliente para actualizar"
-                });
             return;
-        }
 
         mCliente = mClienteSeleccionado.FirstOrDefault();
         var result = await DialogService.OpenAsync<ClienteDialog>("Actualizar Cliente", new Dictionary<string, object>
-    {
-        { "Cliente", mCliente }
-    });
+        {
+            { "Cliente", mCliente }
+        });
 
         if (result != null && (bool)result)
         {
             mListaClientes = await mdsClientes.getClientes();
-            mClienteSeleccionado = null;
             StateHasChanged();
-
-            Notification.Notify(new NotificationMessage
-                {
-                    Severity = NotificationSeverity.Success,
-                    Summary = "Cliente Actualizado",
-                    Detail = "El Cliente se ha actualizado correctamente"
-                });
-        }
-        else
-        {
-            Notification.Notify(new NotificationMessage
-                {
-                    Severity = NotificationSeverity.Error,
-                    Summary = "Error",
-                    Detail = "Error al actualizar el Cliente"
-                });
         }
     }
 
     private async Task EliminarCliente()
     {
         if (mClienteSeleccionado == null || !mClienteSeleccionado.Any())
-        {
-            Notification.Notify(new NotificationMessage
-                {
-                    Severity = NotificationSeverity.Warning,
-                    Summary = "Advertencia",
-                    Detail = "Debe seleccionar un cliente para eliminar"
-                });
             return;
-        }
 
         var cliente = mClienteSeleccionado.FirstOrDefault();
         if (await mdsClientes.eliminarCliente(cliente.Identificacion) == true)
         {
             mListaClientes = await mdsClientes.getClientes();
-            mClienteSeleccionado = null;
             StateHasChanged();
-
-            Notification.Notify(new NotificationMessage
-                {
-                    Severity = NotificationSeverity.Success,
-                    Summary = "Cliente Eliminado",
-                    Detail = "El Cliente se ha eliminado correctamente"
-                });
-        }
-        else
-        {
-            Notification.Notify(new NotificationMessage
-                {
-                    Severity = NotificationSeverity.Error,
-                    Summary = "Error",
-                    Detail = "Error al eliminar el Cliente"
-                });
         }
     }
+
+    private async Task BuscarCliente()
+{
+    var result = await DialogService.OpenAsync<BuscarClienteDialog>("Buscar Cliente");
+
+    cCliente mClienteEncontradoResultado = result as cCliente;
+
+    if (result != null)
+    {
+        mClienteEncontrado = mClienteEncontradoResultado; 
+        StateHasChanged();
+
+        Notification.Notify(new NotificationMessage
+        {
+            Severity = NotificationSeverity.Success,
+            Summary = "Cliente Encontrado",
+            Detail = $"Cliente {mClienteEncontrado.Nombre} encontrado"
+        });
+    }
+    else
+    {
+        Notification.Notify(new NotificationMessage
+        {
+            Severity = NotificationSeverity.Warning,
+            Summary = "No Encontrado",
+            Detail = "No se encontró un cliente con esa identificación"
+        });
+    }
+}
 
 }
